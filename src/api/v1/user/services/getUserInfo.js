@@ -1,7 +1,6 @@
 import user from '#~/model/user.js'
 import {} from 'dotenv/config'
-// import jwt from 'jsonwebtoken'
-// import configuration from '#~/model/configuration.js'
+
 
 const access_token_key = process.env.ACCESS_TOKEN_KEY
 

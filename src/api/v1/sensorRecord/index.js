@@ -1,13 +1,9 @@
 import {Router} from 'express'
-import register from './controllers/register.js'
-import login from './controllers/login.js'
-import getUserInfo from './controllers/getUserInfo.js'
+import getValue from './controllers/getValue.js'
 
 import userAuth from '#~/middleware/userAuth.js'
 
-const user_router = Router()
-user_router.post('/register', register)
-user_router.post('/login', login)
-user_router.get('/user-information',getUserInfo)
+const sensor_router = Router()
+sensor_router.get('/values', getValue)
 
-export default user_router
+export default sensor_router
