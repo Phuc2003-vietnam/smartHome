@@ -10,6 +10,7 @@ async function changeDetail({
 	close_time = -1,
 	schedule = [],
 	isScheduleDeleted = false,
+	topic=-1
 }) {
 	var newSet = {}
 	var newSchedule = {}
@@ -20,6 +21,11 @@ async function changeDetail({
 	}
 	if (state != -1) {
 		newSet.state = state
+		//Update the state of hardware
+		if(topic!=-1)
+		{
+			mqttClient.publish(topic, state, { qos: 0 });
+		}
 	}
 	if (mode != -1) {
 		newSet.mode = mode
@@ -31,7 +37,6 @@ async function changeDetail({
 		newSet.close_time = close_time
 	}
 	update.$set = newSet
-
 	if (schedule != 0) {
 		// TODO check the date Type (not done)
 		// TODO check if the start already exist and less than end(not done)
