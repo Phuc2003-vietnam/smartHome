@@ -7,7 +7,6 @@ const ver1_router = Router()
 ver1_router.use('/user', user_router)
 ver1_router.use('/device', device_router)
 ver1_router.use('/sensor', device_router)
-v
 
 
 export default ver1_router

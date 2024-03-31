@@ -21,6 +21,9 @@ function getTime(){
 }
 
 async function getValue({type,isAll}) {
+	//isAll(boolean) to get all values of temperature,humidty,brightness(detected) ,
+	// if false get only 1 value
+	//type is one of these values['temperature', 'humidity', 'brightness']
 	let { startOfToday, endOfToday } = getTime();
     let query = { type, createdAt: { $gte: startOfToday, $lt: endOfToday } };
 
@@ -32,7 +35,7 @@ async function getValue({type,isAll}) {
         return latestRecord;
     }
 
-    // For all records, fetch without any limitation
+    // For all records, fetch only today values
     const allRecords = await sensorRecord.find(query);
     return allRecords;
 }

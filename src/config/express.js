@@ -1,7 +1,6 @@
 	import express from 'express'
 	import cors from 'cors'
 	import router from '../routers/index.js'
-	import configSwagger from './swagger.js'
 	// import configSwagger from './swagger.js'
 
 	import {} from "dotenv/config";

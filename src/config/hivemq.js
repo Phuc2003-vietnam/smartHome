@@ -53,6 +53,7 @@ async function connect() {
 			let humidity = parts[1].trim().split('%')[0]
 			new SensorService().addValue(humidity, LIMIT_HUMIDITY, 'humidity')
 		} else if (topic === 'brightness') {
+			//Handle brightness=0 means nobody, BE see if it's automode will close door after x times
 		}
 	})
 

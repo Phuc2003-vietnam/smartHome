@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const sensorRecordSchema = new Schema(
   {
     sensorRecord_id: { type: Number, unique: true },
-    type: { type: String, enum: ['temperature', 'humidity', 'detected'], default: 'null' },
+    type: { type: String, enum: ['temperature', 'humidity', 'brightness'], default: 'null' },
     value: { type: Number, default: true },
     limit: { type: Date, default: false },
   },
