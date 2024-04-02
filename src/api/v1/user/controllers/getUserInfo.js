@@ -1,8 +1,9 @@
-import UserSerivce from '../services/index.js'
+import UserService from '../services/index.js'
 
 const getUserInfo = async (req, res, next) => {
 	try {
-		const data = await new UserService().getUserInfo(req.accessToken)
+		let {email}=req.body
+		const data = await new UserService().getUserInfo({email})
 		res.status(200).json({data})
 	} catch (err) {
 		next(err)

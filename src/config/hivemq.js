@@ -1,74 +1,95 @@
-import mqtt from 'mqtt'
-import {} from 'dotenv/config'
-import SensorService from '#~/api/v1/sensorRecord/services/index.js'
+import mqtt from 'mqtt';
+import {} from 'dotenv/config';
+import SensorService from '#~/api/v1/sensorRecord/services/index.js';
 
+const LIMIT_TEMP = 27;
+const LIMIT_HUMIDITY = 80;
 
-const LIMIT_TEMP = 28
-const LIMIT_HUMIDITY = 50
+class MqttService {
+    static mqttClient = null;
 
+    static async connect() {
+        if (!MqttService.mqttClient) {
+            const clientId = 'client' + Date.now();
+            const host = process.env.HIVEMQ_HOST;
 
-async function connect() {
-	const clientId = 'client' + Date.now()
-	const host = process.env.HIVEMQ_HOST
+            const options = {
+                username: process.env.HIVEMQ_USERNAME,
+                password: process.env.HIVEMQ_PASSWORD,
+                keepalive: 60,
+                clientId: clientId,
+                protocolId: 'MQTT',
+                protocolVersion: 4,
+                clean: true,
+                reconnectPeriod: 1000,
+                connectTimeout: 30 * 1000,
+            };
 
-	// Fetch CA certificate
-	const options = {
-		username: process.env.HIVEMQ_USERNAME,
-		password: process.env.HIVEMQ_PASSWORD,
-		keepalive: 60,
-		clientId: clientId,
-		protocolId: 'MQTT',
-		protocolVersion: 4,
-		clean: true,
-		reconnectPeriod: 1000,
-		connectTimeout: 30 * 1000,
-	}
-	try {
-		const mqttClient = await mqtt.connectAsync(host, options)
-	} catch (error) {
-		console.log('connect failure')
-	}
+            try {
+                MqttService.mqttClient = mqtt.connect(host, options);
 
-	const mqttClient = mqtt.connect(host, options)
+                MqttService.mqttClient.on('error', (err) => {
+                    console.log('Error: ', err);
+                    MqttService.mqttClient.end();
+                    MqttService.mqttClient = null; // Reset mqttClient on error
+                });
 
-	mqttClient.on('error', (err) => {
-		console.log('Error: ', err)
-		mqttClient.end()
-	})
+                MqttService.mqttClient.on('reconnect', () => {
+                    console.log('Reconnecting...');
+                });
 
-	mqttClient.on('reconnect', () => {
-		console.log('Reconnecting...')
-	})
+                MqttService.mqttClient.on('message', async function(topic, message) {
+                    try{
+                        let str = message.toString();
+                        let parts = str.split(':');
+    
+                        if (topic === 'led-bed-room') {
+                            // Handle led-bed-room topic
+                        } else if (topic === 'temperature') {
+                            let temperature = parts[1].trim().split('°')[0];
+                            await new SensorService().addValue({
+                                value: temperature,
+                                limit: LIMIT_TEMP,
+                                type: 'temperature',
+                            });
+                        } else if (topic === 'humidity') {
+                            let humidity = parts[1].trim().split('%')[0];
+                            await new SensorService().addValue({
+                                value: humidity,
+                                limit: LIMIT_HUMIDITY,
+                                type: 'humidity',
+                            });
+                        } else if (topic === 'brightness') {
+                            // Handle brightness topic
+                        }
+                    }catch(err)
+                    {
+                        throw Error(err)
+                    }
+                    
+                });
 
-	mqttClient.on('message', function (topic, message) {
-		let str = message.toString()
-		let parts = str.split(':')
+                MqttService.mqttClient.on('connect', function() {
+                    console.log('Đã kết nối tới MQTT broker');
 
-		if (topic === 'led-bed-room') {
-		} else if (topic === 'temperature') {
-			//Split string
-			let temperature = parts[1].trim().split('°')[0]
-			new SensorService().addValue(temperature, LIMIT_TEMP, 'temperature')
-		} else if (topic === 'humidity') {
-			let humidity = parts[1].trim().split('%')[0]
-			new SensorService().addValue(humidity, LIMIT_HUMIDITY, 'humidity')
-		} else if (topic === 'brightness') {
-			//Handle brightness=0 means nobody, BE see if it's automode will close door after x times
-		}
-	})
+                    MqttService.mqttClient.subscribe('fan', { qos: 0 });
+                    MqttService.mqttClient.subscribe('door', { qos: 0 });
 
-	mqttClient.on('connect', function () {
-		console.log('Đã kết nối tới MQTT broker')
+                    MqttService.mqttClient.subscribe('light-living-room', { qos: 0 });
+                    MqttService.mqttClient.subscribe('light-kitchen', { qos: 0 });
 
-		mqttClient.subscribe('fan', {qos: 0})
-		mqttClient.subscribe('door', {qos: 0})
+                    MqttService.mqttClient.subscribe('temperature', { qos: 0 });
+                    MqttService.mqttClient.subscribe('humidity', { qos: 0 });
+                });
+            } catch (err) {
+                throw Error(err);
+            }
+        }
+    }
 
-		mqttClient.subscribe('light-living-room', {qos: 0})
-		mqttClient.subscribe('light-kitchen', {qos: 0})
-
-		mqttClient.subscribe('temperature', {qos: 0})
-		mqttClient.subscribe('humidity', {qos: 0})
-	})
+    static getMqttClient() {
+        return MqttService.mqttClient;
+    }
 }
 
-export default {connect}
+export default MqttService;

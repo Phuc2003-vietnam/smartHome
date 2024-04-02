@@ -1,20 +1,18 @@
 	import express from 'express'
 	import cors from 'cors'
 	import router from '../routers/index.js'
-	// import configSwagger from './swagger.js'
 
 	import {} from "dotenv/config";
 	import db from "./mongoDB.js";
-	import hivemq from "./hivemq.js";
+	import MqttService from "./hivemq.js";
 	import {createServer} from 'http'
-	// import {initializeSocketServer} from "./socketIo.js"
 
 	const port =  8000
 
 	const configExpressApp = async (app) => {
 		const httpServer = createServer(app)
 		db.connect()
-		hivemq.connect()
+		MqttService.connect()
 		app.set('port', port)
 		app.use(cors())
 		app.use(express.json())

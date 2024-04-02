@@ -1,30 +1,44 @@
 import device from '#~/model/device.js'
 import {v4 as uuidv4} from 'uuid'
-//isScheduleDeleted to check if user want to delete the schedule
+import MqttService from '#~/config/hivemq.js'
+
+function isDateValid(start, end) {
+	startDate = new Date(start)
+	endDate = new Date(end)
+	if (!isNaN(startDate) || !isNaN(endDate)) {
+		return 0
+	}
+	if (startDate > endDate) {
+		return 0
+	}
+	return 1
+}
+
+
+//isScheduleDeleted to check if user want to delete the schedule or
+//add a new schedule to existing schedules, if isScheduleDeleted true => FE only needs
+//to pass array of device_id
+
 async function changeDetail({
 	device_id,
-	type,
 	state = -1,
 	mode = -1,
 	level = -1,
 	close_time = -1,
 	schedule = [],
 	isScheduleDeleted = false,
-	topic=-1
+	topic = -1,
 }) {
 	var newSet = {}
-	var newSchedule = {}
-	var update = {}
-	//TODO: check the time of start and end in correct format
 	if (!device_id) {
-		return Promise.reject({status: 401, message: 'Forgot to pass some parameters'})
+		return Promise.reject({status: 401, message: 'Forgot to pass device_id'})
 	}
 	if (state != -1) {
+		console.log(state);
 		newSet.state = state
 		//Update the state of hardware
-		if(topic!=-1)
-		{
-			mqttClient.publish(topic, state, { qos: 0 });
+		if (topic != -1) {
+			MqttService.mqttClient.publish(topic,state.toString(), {qos: 0})
 		}
 	}
 	if (mode != -1) {
@@ -36,23 +50,29 @@ async function changeDetail({
 	if (close_time != -1) {
 		newSet.close_time = close_time
 	}
-	update.$set = newSet
+
+	//Handle schedule mode for fan
 	if (schedule != 0) {
-		// TODO check the date Type (not done)
-		// TODO check if the start already exist and less than end(not done)
+		// if isScheduleDeleted true, cancel the running schedule job
 		if (isScheduleDeleted) {
-			this.scheduleJob({device_id, schedule, isAll: false,isDeleted})
+			this.scheduleJob({device_id, schedule, isAll: false, isDeleted})
 		} else {
-			update.$push.schedule.$each = schedule
+			//isScheduleDeleted false: schedule the jobs
 			for (job of schedule) {
+				//check the date Type in correct format
+				if (!isDateValid(job.start, job.end)) {
+					return Promise.reject({
+						status: 401,
+						message: 'Invalid date format',
+					})
+				}
 				job.schedule_id = uuidv4()
 			}
 			this.scheduleJob({device_id, schedule, isAll: false})
 		}
 	}
-	//TODO: when delete the schedule , we need to stop the scheduleJob
 	const updatedDevice = await device
-		.findOneAndUpdate({device_id}, {update}, {new: true})
+		.findOneAndUpdate({device_id}, {$set:newSet,$push:{schedule:{$each:schedule}}}, {new: true})
 		.lean()
 
 	return updatedDevice

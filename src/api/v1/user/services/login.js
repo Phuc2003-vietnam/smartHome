@@ -2,7 +2,6 @@ import bcrypt from 'bcrypt'
 import user from '#~/model/user.js'
 
 async function login({email, password}) {
-    console.log(email);
     const userRecord = await user.findOne({email})
     if (!userRecord) {
 		return Promise.reject({

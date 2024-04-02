@@ -1,13 +1,13 @@
 import device from '#~/model/device.js'
 import {} from 'dotenv/config'
-import { query } from 'express'
 
 
 async function getDevices({device_id,type,isAll}) {
 	try {
-		query={}
+		let query={}
 		if(!isAll)
 		{
+			console.log("dm");
 			if(type)
 			{
 				query.type=type
@@ -17,10 +17,12 @@ async function getDevices({device_id,type,isAll}) {
 				query.device_id=device_id
 			}
 		}
+		console.log("2222");
+
 		var deviceRecord = await device.find(query).lean()
 		return deviceRecord
 	} catch (err) {
-		return Promise.reject({status: 401, message: "Error"})
+		return Promise.reject({status: 401, message: err})
 	}
 }
 export default getDevices
