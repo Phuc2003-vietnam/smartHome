@@ -18,12 +18,10 @@ async function addValue({value, limit, type}) {
 			//If fan is in auto mode => turn on level 3 because temperature too high
 			let fan = (await deviceObj.getDevices({type: 'fan', isAll: false}))[0]
 			if (fan.mode == 'auto') {
-				console.log("hello");
 				var level = 3
 				deviceObj.changeDetail({device_id: fan.device_id, level})
 			}
 		}
-		console.log("2222");
 		await new NotificationService().addNotification({description})
 	} else {
 		await sensorRecord.create({

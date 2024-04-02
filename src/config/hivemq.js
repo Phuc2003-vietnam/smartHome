@@ -1,8 +1,9 @@
 import mqtt from 'mqtt';
 import {} from 'dotenv/config';
 import SensorService from '#~/api/v1/sensorRecord/services/index.js';
+import DeviceService from '#~/api/v1/device/services/index.js';
 
-const LIMIT_TEMP = 27;
+const LIMIT_TEMP = 35;
 const LIMIT_HUMIDITY = 80;
 
 class MqttService {
@@ -61,6 +62,8 @@ class MqttService {
                             });
                         } else if (topic === 'brightness') {
                             // Handle brightness topic
+                            DeviceService.scheduleJob({})
+                            console.log(str);
                         }
                     }catch(err)
                     {

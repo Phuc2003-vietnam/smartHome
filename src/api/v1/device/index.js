@@ -4,7 +4,7 @@ import changeDetail from './controllers/changeDetail.js'
 
 const user_router = Router()
 
-user_router.post('/general-information',getDevices)
+user_router.get('/general-information',getDevices)
 user_router.put('/details',changeDetail)
 
 

@@ -28,18 +28,25 @@ async function changeDetail({
 	schedule = [],
 	isScheduleDeleted = false,
 	topic = -1,
+	
 }) {
 	var newSet = {}
 	if (!device_id) {
 		return Promise.reject({status: 401, message: 'Forgot to pass device_id'})
 	}
 	if (state != -1) {
-		console.log(state);
 		newSet.state = state
 		//Update the state of hardware
-		if (topic != -1) {
-			MqttService.mqttClient.publish(topic,state.toString(), {qos: 0})
+		if (topic == 'fan') {
+			var level = (await this.getDevices({device_id})).level
+			let msg={state,level}
+			MqttService.mqttClient.publish(topic,JSON.stringify(msg), {qos: 0})
 		}
+		else if (topic != 'fan' && topic != -1) {
+			let msg={state}
+			MqttService.mqttClient.publish(topic,JSON.stringify(msg), {qos: 0})
+		}
+		
 	}
 	if (mode != -1) {
 		newSet.mode = mode
@@ -52,24 +59,8 @@ async function changeDetail({
 	}
 
 	//Handle schedule mode for fan
-	if (schedule != 0) {
-		// if isScheduleDeleted true, cancel the running schedule job
-		if (isScheduleDeleted) {
-			this.scheduleJob({device_id, schedule, isAll: false, isDeleted})
-		} else {
-			//isScheduleDeleted false: schedule the jobs
-			for (job of schedule) {
-				//check the date Type in correct format
-				if (!isDateValid(job.start, job.end)) {
-					return Promise.reject({
-						status: 401,
-						message: 'Invalid date format',
-					})
-				}
-				job.schedule_id = uuidv4()
-			}
-			this.scheduleJob({device_id, schedule, isAll: false})
-		}
+	if (schedule.length != 0 && mode=='scheduled') {
+		this.scheduleJob({device_id, schedule, isReset: false,isDeleted,type})
 	}
 	const updatedDevice = await device
 		.findOneAndUpdate({device_id}, {$set:newSet,$push:{schedule:{$each:schedule}}}, {new: true})

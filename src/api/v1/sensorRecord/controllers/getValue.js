@@ -2,7 +2,8 @@ import SensorService from '../services/index.js'
 
 const getValue = async (req, res, next) => {
 	try {
-		const {type,isAll}=req.body
+		var {type,isAll}=req.query
+		isAll=JSON.parse(isAll)
 		const data = await new SensorService().getValue({
 			type,isAll
 		})

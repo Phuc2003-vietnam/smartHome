@@ -1,9 +1,9 @@
-import notification from '#~/model/device.js'
+import notification from '#~/model/notification.js'
 
 
 async function getNotifications() {
 	try {
-		var notifications = await notification.find({}).sort({actionTime: -1}).lean()
+		var notifications = await notification.find({}).sort({createdAt: -1}).lean()
 		return notifications
 	} catch (err) {
 		return Promise.reject({status: 401, message: err})

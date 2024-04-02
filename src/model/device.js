@@ -8,13 +8,14 @@ const deviceSchema = new Schema(
 		state: {type: Boolean, default: false},
 		mode: {type: String, enum: ['auto', 'manual', 'scheduled'], default: 'auto'},
 		level: {type: Number, default: true},
+		close_time:{type:Number,default:20},
 		type: {type: String, enum: ['fan', 'door', 'light'], default: 'auto'},
 		schedule: [
 			{
-				schedule_id:{type:String,unique:true},
+				schedule_id: {type: String, default: 'default'},
 				start: {type: Date, default: Date.now},
 				end: {type: Date, default: Date.now},
-				level: {type: Number, default: 1}
+				level: {type: Number, default: 1},
 			},
 		],
 	},
@@ -48,3 +49,4 @@ deviceSchema.pre('save', async function (next) {
 const Device = mongoose.model('Device', deviceSchema)
 
 export default Device
+
