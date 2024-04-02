@@ -13,7 +13,7 @@ async function login({email, password}) {
         console.log(isPasswordRight);
         if(isPasswordRight)
         {
-            return await this.getUserInfo(userRecord.email)
+            return await this.getUserInfo({email:userRecord.email})
         }
         else{
             return Promise.reject({

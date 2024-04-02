@@ -21,11 +21,11 @@ function getTime(){
 }
 
 async function getValue({type,isAll}) {
-	//isAll(boolean) to get all values of temperature,humidty,brightness(detected) ,
-	// if false get only 1 value
+	//isAll(boolean) true to get all values of temperature,humidty,brightness(detected) ,
+	// if false get latest value
 	//type is one of these values['temperature', 'humidity', 'brightness']
 	let { startOfToday, endOfToday } = getTime();
-    let query = { type, createdAt: { $gte: startOfToday, $lt: endOfToday } };
+    let query = { type:type, createdAt: { $gte: startOfToday, $lt: endOfToday } };
 
     if (!isAll) {
         // For the latest record, just limit the result to 1 and sort in descending order

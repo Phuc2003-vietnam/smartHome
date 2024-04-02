@@ -1,10 +1,10 @@
-import SensorRecord from "#~/model/sensorRecord"
+import SensorService from '../services/index.js'
 
 const getValue = async (req, res, next) => {
 	try {
-		const {type,length}=req.body
-		const data = await new SensorSerivce().getValue({
-			type,length
+		const {type,isAll}=req.body
+		const data = await new SensorService().getValue({
+			type,isAll
 		})
 		res.status(200).json({data})
 	} catch (err) {
