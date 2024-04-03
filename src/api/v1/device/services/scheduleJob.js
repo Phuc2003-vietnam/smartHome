@@ -16,22 +16,37 @@ function isIntersect(arr, n) {
 	return false
 }
 
+function isDateValid(start, end) {
+	console.log(start);
+	console.log(end);
+
+	let startDate = new Date(start)
+	let endDate = new Date(end)
+	console.log(startDate);
+	console.log(endDate);
+	if (isNaN(startDate) || isNaN(endDate)) {
+		return 0
+	}
+	if (startDate > endDate) {
+		return 0
+	}
+	return 1
+}
 //isReset==true means we restart server so we have to schedule everything again
 //isReset==false only schedule new jobs
 
 //NOTE: this scheduleJob only schedule job for today time (if want to schedule for everyday=>using cron time)
-async function scheduleFan({device_id, schedule, isReset, isDeleted, type}) {
+async function scheduleFan({obj,device_id, schedule, isReset, isScheduleDeleted, topic}) {
 	try {
 		//if isScheduleDeleted true, cancel the running schedule job ,
 		//isScheduleDeleted false: schedule the new jobs
-
 		if (isScheduleDeleted) {
-			for (job of schedule) {
+			for (let job of schedule) {
 				var my_job = schedule.scheduledJobs[job.schedule_id]
 				my_job.cancel()
 			}
 		} else {
-			var fan = await this.getDevices({device_id})
+			var fan = await obj.getDevices({device_id})
 			var existedSchedule = fan.schedule
 			var newSchedule = schedule
 
@@ -42,7 +57,7 @@ async function scheduleFan({device_id, schedule, isReset, isDeleted, type}) {
 			} else {
 				jobs = newSchedule
 				//Check if type in correct format Datetime
-				for (job of jobs) {
+				for (let job of jobs) {
 					if (!isDateValid(job.start, job.end)) {
 						return Promise.reject({
 							status: 401,
@@ -60,16 +75,17 @@ async function scheduleFan({device_id, schedule, isReset, isDeleted, type}) {
 					})
 				}
 				//update new schedule into Database
-				this.changeDetail({
+				console.log(jobs);
+				obj.changeDetail({
 					device_id,
 					schedule: jobs,
 				})
 			}
 			//Schedule Job for fan
-			for (job of jobs) {
+			for (let job of jobs) {
 				schedule.scheduleJob(job.start, function () {
 					//Change the level + turn on fan using hiveMQ
-					this.changeDetail({
+					obj.changeDetail({
 						device_id,
 						state: 1,
 						mode: 'auto',
@@ -79,7 +95,7 @@ async function scheduleFan({device_id, schedule, isReset, isDeleted, type}) {
 				})
 				schedule.scheduleJob(job.end, function () {
 					//Turn off fan using hiveMQ
-					this.changeDetail({
+					obj.changeDetail({
 						device_id,
 						state: 0,
 						mode: 'auto',
@@ -88,24 +104,26 @@ async function scheduleFan({device_id, schedule, isReset, isDeleted, type}) {
 					})
 				})
 			}
-			this.scheduleJob({device_id, schedule, isReset: false})
+			obj.scheduleJob({device_id, schedule, isReset: false})
 		}
 	} catch (err) {
-		return Promise.reject({status: 401, message: 'Error'})
+		return Promise.reject({status: 401, message: err})
 	}
 }
 
 //NOT YET HANDLE BECAUSE NOT CONNECT TO HONG` NGOAI
-async function scheduleDoor({device_id, schedule, isReset, isDeleted, type}) {
+async function scheduleDoor({obj,device_id, schedule, isReset, isDeleted, topic}) {
 	const pastDate = new Date('2024-04-02T07:58:30Z') // A date in the past
 	pastDate.setMinutes(pastDate.getMinutes() + 20) // Adding 20 minutes
 	console.log(pastDate)
 }
-async function scheduleJob({device_id, schedule, isReset, isDeleted, type, close_time}) {
-	if (type == 'fan') {
-		scheduleFan({device_id, schedule, isReset, isDeleted, type})
-	} else if (type == 'door') {
-		scheduleFan({device_id, close_time, isReset, isDeleted, type})
+async function scheduleJob({device_id, schedule, isReset, isDeleted, topic, close_time}) {
+	if (topic == 'fan') {
+		let obj=this
+		console.log(obj);
+		await scheduleFan({obj,device_id, schedule, isReset, isDeleted, topic})
+	} else if (topic == 'door') {
+		await scheduleDoor({device_id, close_time, isReset, isDeleted, topic})
 	}
 }
 export default scheduleJob

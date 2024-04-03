@@ -7,7 +7,6 @@ async function getDevices({device_id,type,isAll}) {
 		let query={}
 		if(!isAll)
 		{
-			console.log("dm");
 			if(type)
 			{
 				query.type=type
@@ -17,7 +16,6 @@ async function getDevices({device_id,type,isAll}) {
 				query.device_id=device_id
 			}
 		}
-		console.log("2222");
 
 		var deviceRecord = await device.find(query).lean()
 		return deviceRecord

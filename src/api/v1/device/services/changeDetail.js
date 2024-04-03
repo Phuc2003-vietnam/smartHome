@@ -2,17 +2,6 @@ import device from '#~/model/device.js'
 import {v4 as uuidv4} from 'uuid'
 import MqttService from '#~/config/hivemq.js'
 
-function isDateValid(start, end) {
-	startDate = new Date(start)
-	endDate = new Date(end)
-	if (!isNaN(startDate) || !isNaN(endDate)) {
-		return 0
-	}
-	if (startDate > endDate) {
-		return 0
-	}
-	return 1
-}
 
 
 //isScheduleDeleted to check if user want to delete the schedule or
@@ -39,11 +28,11 @@ async function changeDetail({
 		//Update the state of hardware
 		if (topic == 'fan') {
 			var level = (await this.getDevices({device_id})).level
-			let msg={state,level}
+			let msg={state:parseInt(state),level}
 			MqttService.mqttClient.publish(topic,JSON.stringify(msg), {qos: 0})
 		}
 		else if (topic != 'fan' && topic != -1) {
-			let msg={state}
+			let msg={state:parseInt(state)}
 			MqttService.mqttClient.publish(topic,JSON.stringify(msg), {qos: 0})
 		}
 		
@@ -59,8 +48,9 @@ async function changeDetail({
 	}
 
 	//Handle schedule mode for fan
+	console.log(topic);
 	if (schedule.length != 0 && mode=='scheduled') {
-		this.scheduleJob({device_id, schedule, isReset: false,isDeleted,type})
+		await this.scheduleJob({device_id, schedule, isReset: false,isScheduleDeleted,topic})
 	}
 	const updatedDevice = await device
 		.findOneAndUpdate({device_id}, {$set:newSet,$push:{schedule:{$each:schedule}}}, {new: true})

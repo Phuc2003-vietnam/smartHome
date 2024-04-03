@@ -26,6 +26,7 @@
 		"multer": "^1.4.5-lts.1",
 		"multer-utf8": "^1.4.5-lts.11",
 		"mysql": "^2.18.1",
+		"node-schedule": "^2.1.1",
 		"nodemailer": "^6.9.7",
 		"nodemon": "^2.0.22",
 		"page-count": "^0.0.3",

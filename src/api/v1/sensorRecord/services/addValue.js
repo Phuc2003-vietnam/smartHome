@@ -4,7 +4,7 @@ import NotificationService from '#~/api/v1/notification/services/index.js'
 
 // Add value to sensor record(also check auto mode ) and handle if value>limit
 async function addValue({value, limit, type}) {
-	console.log('value: ', value, 'limit: ', limit, 'type: ', type)
+	// console.log('value: ', value, 'limit: ', limit, 'type: ', type)
 	if (!value || !limit || !type) {
 		throw Error('Forget to pass value')
 	}
