@@ -61,7 +61,7 @@ class MqttService {
                                 type: 'humidity',
                             });
                         } else if (topic === 'brightness') {
-                            // Handle brightness topic
+                            //TODO: Handle brightness topic
                             DeviceService.scheduleJob({})
                             console.log(str);
                         }

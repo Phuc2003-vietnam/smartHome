@@ -2,7 +2,6 @@ import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 const notificationSchema = new Schema(
 	{
-        notification_id: { type: Number, unique: true },
         description: { type: String, default: 'default' },
 		
 	},

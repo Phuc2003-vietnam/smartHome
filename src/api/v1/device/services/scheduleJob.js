@@ -112,6 +112,7 @@ async function scheduleFan({obj,device_id, schedule, isReset, isScheduleDeleted,
 }
 
 //NOT YET HANDLE BECAUSE NOT CONNECT TO HONG` NGOAI
+//TODO: lúc bật auto mode ta sẽ schedule sau x time sẽ đóng rồi khi nhận được state của hồng ngoại là 1 thì canceljob rồi đặt job mới sau 5p đó tiếp
 async function scheduleDoor({obj,device_id, schedule, isReset, isDeleted, topic}) {
 	const pastDate = new Date('2024-04-02T07:58:30Z') // A date in the past
 	pastDate.setMinutes(pastDate.getMinutes() + 20) // Adding 20 minutes

@@ -8,6 +8,7 @@ import MqttService from '#~/config/hivemq.js'
 //add a new schedule to existing schedules, if isScheduleDeleted true => FE only needs
 //to pass array of device_id
 
+//TODO: Forgot to handle when turn off and on auto mode for both fan and door
 async function changeDetail({
 	device_id,
 	state = -1,
@@ -28,11 +29,11 @@ async function changeDetail({
 		//Update the state of hardware
 		if (topic == 'fan') {
 			var level = (await this.getDevices({device_id})).level
-			let msg={state:parseInt(state),level}
+			let msg={state:Number(state),level}
 			MqttService.mqttClient.publish(topic,JSON.stringify(msg), {qos: 0})
 		}
 		else if (topic != 'fan' && topic != -1) {
-			let msg={state:parseInt(state)}
+			let msg={state:Number(state)}
 			MqttService.mqttClient.publish(topic,JSON.stringify(msg), {qos: 0})
 		}
 		
@@ -49,7 +50,7 @@ async function changeDetail({
 
 	//Handle schedule mode for fan
 	console.log(topic);
-	if (schedule.length != 0 && mode=='scheduled') {
+	if ((schedule.length != 0 && mode=='scheduled') || (topic=='door' && close_time)) {
 		await this.scheduleJob({device_id, schedule, isReset: false,isScheduleDeleted,topic})
 	}
 	const updatedDevice = await device
