@@ -3,8 +3,6 @@ import Device from '../services/index.js'
 const getDevice = async (req, res, next) => {
 	try {
 		let {device_id,type,isAll} = req.query
-		console.log(req.query)
-		console.log(req.query);
 		device_id = device_id ? JSON.parse(device_id):undefined
         isAll =isAll ? JSON.parse(isAll):false
 		const data = await new Device().getDevices({device_id,type,isAll})

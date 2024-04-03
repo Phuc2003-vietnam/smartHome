@@ -6,7 +6,7 @@ const deviceSchema = new Schema(
 		device_id: {type: Number, unique: true},
 		name: {type: String, default: 'default'},
 		state: {type: Boolean, default: false},
-		mode: {type: String, enum: ['auto', 'manual', 'scheduled'], default: 'auto'},
+		isAuto: {type: Boolean,default: false},
 		level: {type: Number, default: true},
 		close_time:{type:Number,default:20},
 		type: {type: String, enum: ['fan', 'door', 'light'], default: 'auto'},

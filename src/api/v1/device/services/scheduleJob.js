@@ -1,5 +1,6 @@
 import {} from 'dotenv/config'
 import schedule from 'node-schedule'
+import MqttService from '#~/config/hivemq.js'
 
 function isIntersect(arr, n) {
 	arr.sort(function (i1, i2) {
@@ -112,19 +113,43 @@ async function scheduleFan({obj,device_id, schedule, isReset, isScheduleDeleted,
 }
 
 //NOT YET HANDLE BECAUSE NOT CONNECT TO HONG` NGOAI
-//TODO: lúc bật auto mode ta sẽ schedule sau x time sẽ đóng rồi khi nhận được state của hồng ngoại là 1 thì canceljob rồi đặt job mới sau 5p đó tiếp
-async function scheduleDoor({obj,device_id, schedule, isReset, isDeleted, topic}) {
-	const pastDate = new Date('2024-04-02T07:58:30Z') // A date in the past
-	pastDate.setMinutes(pastDate.getMinutes() + 20) // Adding 20 minutes
-	console.log(pastDate)
+//Lúc bật auto mode ta sẽ schedule sau x time sẽ đóng rồi khi nhận được state của hồng 
+//ngoại là 1 thì canceljob rồi đặt job mới sau 5p đó tiếp
+async function scheduleDoor({obj, isReset, isDeleted, topic}) {
+	var door = await obj.getDevices({type:topic})
+	var oldJobSchedule_id=door.schedule[0].schedule_id
+	//find the close time in Date
+	var currentDate = new Date(Date.now()) 
+	currentDate.setMinutes(pastDate.getMinutes() + door.close_time) 
+
+	let newDoorSchedule={
+		schedule_id:uuid(),
+		start: new Date(Date.now()) ,
+		end: currentDate
+	}
+	
+	if (door.isAuto==true)
+	{
+		//cancel the oldjob timing as we detect there are people
+		var oldJob = schedule.scheduledJobs[oldJobSchedule_id];
+		oldJob.cancel();
+		//schedule new job and update schedule for door
+		schedule.scheduleJob(newDoorSchedule.schedule_id,newDoorSchedule.end, function () {
+			//Close the door using hiveMQ
+			let msg={state:0}
+			MqttService.mqttClient.publish(topic,JSON.stringify(msg), {qos: 0})
+		})
+		obj.changeDetail({device_id:door.device_id,schedule:[newDoorSchedule],isDoorScheduleDeleted:true})
+
+	}
+
 }
-async function scheduleJob({device_id, schedule, isReset, isDeleted, topic, close_time}) {
+async function scheduleJob({device_id, schedule, isReset, isDeleted, topic, close_time,isDetected}) {
+	let obj=this
 	if (topic == 'fan') {
-		let obj=this
-		console.log(obj);
 		await scheduleFan({obj,device_id, schedule, isReset, isDeleted, topic})
 	} else if (topic == 'door') {
-		await scheduleDoor({device_id, close_time, isReset, isDeleted, topic})
+		await scheduleDoor({obj,isReset,isDeleted,isDetected,topic})
 	}
 }
 export default scheduleJob

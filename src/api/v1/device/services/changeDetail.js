@@ -1,8 +1,5 @@
 import device from '#~/model/device.js'
-import {v4 as uuidv4} from 'uuid'
 import MqttService from '#~/config/hivemq.js'
-
-
 
 //isScheduleDeleted to check if user want to delete the schedule or
 //add a new schedule to existing schedules, if isScheduleDeleted true => FE only needs
@@ -12,13 +9,13 @@ import MqttService from '#~/config/hivemq.js'
 async function changeDetail({
 	device_id,
 	state = -1,
-	mode = -1,
 	level = -1,
 	close_time = -1,
 	schedule = [],
 	isScheduleDeleted = false,
+	isDoorScheduleDeleted = false,
 	topic = -1,
-	
+	isAuto = -1,
 }) {
 	var newSet = {}
 	if (!device_id) {
@@ -29,17 +26,15 @@ async function changeDetail({
 		//Update the state of hardware
 		if (topic == 'fan') {
 			var level = (await this.getDevices({device_id})).level
-			let msg={state:Number(state),level}
-			MqttService.mqttClient.publish(topic,JSON.stringify(msg), {qos: 0})
+			let msg = {state: Number(state), level}
+			MqttService.mqttClient.publish(topic, JSON.stringify(msg), {qos: 0})
+		} else if (topic != 'fan' && topic != -1) {
+			let msg = {state: Number(state)}
+			MqttService.mqttClient.publish(topic, JSON.stringify(msg), {qos: 0})
 		}
-		else if (topic != 'fan' && topic != -1) {
-			let msg={state:Number(state)}
-			MqttService.mqttClient.publish(topic,JSON.stringify(msg), {qos: 0})
-		}
-		
 	}
-	if (mode != -1) {
-		newSet.mode = mode
+	if (isAuto != -1) {
+		newSet.isAuto = isAuto
 	}
 	if (level != -1) {
 		newSet.level = level
@@ -49,13 +44,37 @@ async function changeDetail({
 	}
 
 	//Handle schedule mode for fan
-	console.log(topic);
-	if ((schedule.length != 0 && mode=='scheduled') || (topic=='door' && close_time)) {
-		await this.scheduleJob({device_id, schedule, isReset: false,isScheduleDeleted,topic})
+	console.log(topic)
+	if (topic == 'fan' && schedule.length) {
+		await this.scheduleJob({
+			device_id,
+			schedule,
+			isReset: false,
+			isScheduleDeleted,
+			topic,
+		})
 	}
-	const updatedDevice = await device
-		.findOneAndUpdate({device_id}, {$set:newSet,$push:{schedule:{$each:schedule}}}, {new: true})
-		.lean()
+	if (isDoorScheduleDeleted) {
+		const updatedDevice = await device
+			.findOneAndUpdate(
+				{device_id},
+				{
+					$set: newSet,
+					$unset: {schedule: ''},
+					$push: {schedule: {$each: schedule}},
+				},
+				{new: true}
+			)
+			.lean()
+	} else {
+		const updatedDevice = await device
+			.findOneAndUpdate(
+				{device_id},
+				{$set: newSet, $push: {schedule: {$each: schedule}}},
+				{new: true}
+			)
+			.lean()
+	}
 
 	return updatedDevice
 }
