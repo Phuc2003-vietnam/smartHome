@@ -29,7 +29,7 @@ async function changeDetail({
 			let level=0
 			if(state==1)
 			{
-				level = (await this.getDevices({device_id})).level
+				level = (await this.getDevices({device_id}))[0].level
 			}
 			MqttService.mqttClient.publish(topic, level.toString(), {qos: 0})
 		} else if (topic != 'fan' && topic != -1) {
