@@ -4,7 +4,7 @@ import SensorService from '#~/api/v1/sensorRecord/services/index.js';
 import DeviceService from '#~/api/v1/device/services/index.js';
 
 const LIMIT_TEMP = 35;
-const LIMIT_HUMIDITY = 80;
+const LIMIT_HUMIDITY = 88;
 
 class MqttService {
     static mqttClient = null;
@@ -62,7 +62,7 @@ class MqttService {
                             });
                         } else if (topic === 'brightness') {
                             //TODO: Handle brightness topic
-                            DeviceService.scheduleJob({})
+                            DeviceService.scheduleJob({topic:'door'})
                             console.log(str);
                         }
                     }catch(err)

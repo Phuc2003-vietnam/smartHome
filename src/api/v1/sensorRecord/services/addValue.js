@@ -4,7 +4,7 @@ import NotificationService from '#~/api/v1/notification/services/index.js'
 
 // Add value to sensor record(also check auto mode ) and handle if value>limit
 async function addValue({value, limit, type}) {
-	console.log('value: ', value, 'limit: ', limit, 'type: ', type)
+	// console.log('value: ', value, 'limit: ', limit, 'type: ', type)
 	if (!value || !limit || !type) {
 		throw Error('Forget to pass value')
 	}
@@ -15,6 +15,7 @@ async function addValue({value, limit, type}) {
 		} else if (type == 'temperature') {
 			let deviceObj = new DeviceService()
 			var description = 'The temperature in room exceeds'
+			//TODO not yet handle when auto and schedule at same time
 			//If fan is in auto mode => turn on level 3 because temperature too high
 			let fan = (await deviceObj.getDevices({type: 'fan', isAll: false}))[0]
 			if (fan.isAuto) {

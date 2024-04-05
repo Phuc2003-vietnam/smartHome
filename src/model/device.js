@@ -12,7 +12,8 @@ const deviceSchema = new Schema(
 		type: {type: String, enum: ['fan', 'door', 'light'], default: 'auto'},
 		schedule: [
 			{
-				schedule_id: {type: String, default: 'default'},
+				start_schedule_id: {type: String, default: 'default'},
+				end_schedule_id: {type: String, default: 'default'},
 				start: {type: Date, default: Date.now},
 				end: {type: Date, default: Date.now},
 				level: {type: Number, default: 1},

@@ -11,12 +11,13 @@ async function changeDetail({
 	state = -1,
 	level = -1,
 	close_time = -1,
-	schedule = [],
+	scheduleTime = [],
 	isScheduleDeleted = false,
 	isDoorScheduleDeleted = false,
 	topic = -1,
 	isAuto = -1,
 }) {
+	// console.log("device_id : ",device_id," state: ",state," level: ",level," topic: ",topic);
 	var newSet = {}
 	if (!device_id) {
 		return Promise.reject({status: 401, message: 'Forgot to pass device_id'})
@@ -25,12 +26,14 @@ async function changeDetail({
 		newSet.state = state
 		//Update the state of hardware
 		if (topic == 'fan') {
-			var level = (await this.getDevices({device_id})).level
-			let msg = {state: Number(state), level}
-			MqttService.mqttClient.publish(topic, JSON.stringify(msg), {qos: 0})
+			let level=0
+			if(state==1)
+			{
+				level = (await this.getDevices({device_id})).level
+			}
+			MqttService.mqttClient.publish(topic, level.toString(), {qos: 0})
 		} else if (topic != 'fan' && topic != -1) {
-			let msg = {state: Number(state)}
-			MqttService.mqttClient.publish(topic, JSON.stringify(msg), {qos: 0})
+			MqttService.mqttClient.publish(topic, state.toString(), {qos: 0})
 		}
 	}
 	if (isAuto != -1) {
@@ -43,34 +46,47 @@ async function changeDetail({
 		newSet.close_time = close_time
 	}
 
-	//Handle schedule mode for fan
-	console.log(topic)
-	if (topic == 'fan' && schedule.length) {
+	//Handle schedule time for fan
+	if (topic == 'fan' && scheduleTime.length) {
 		await this.scheduleJob({
 			device_id,
-			schedule,
+			scheduleTime,
 			isReset: false,
 			isScheduleDeleted,
 			topic,
 		})
 	}
-	if (isDoorScheduleDeleted) {
-		const updatedDevice = await device
+	//Handle delete schedule for fan 
+	if (isScheduleDeleted) {
+		const startIds = scheduleTime.map((schedule) => schedule.start_schedule_id)
+		var updatedDevice = await device
 			.findOneAndUpdate(
 				{device_id},
 				{
-					$set: newSet,
-					$unset: {schedule: ''},
-					$push: {schedule: {$each: schedule}},
+					$pull: {schedule: {start_schedule_id: {$in: startIds}}},
 				},
 				{new: true}
 			)
 			.lean()
-	} else {
-		const updatedDevice = await device
+	} 	//Handle update schedule for door
+	else if (isDoorScheduleDeleted) {
+		var updatedDevice = await device
 			.findOneAndUpdate(
 				{device_id},
-				{$set: newSet, $push: {schedule: {$each: schedule}}},
+				{
+					$set: newSet,
+					$unset: {scheduleTime: ''},
+					$push: {schedule: {$each: scheduleTime}},
+				},
+				{new: true}
+			)
+			.lean()
+	}//Handle update schedule for fan + update other things
+	else {
+		var updatedDevice = await device
+			.findOneAndUpdate(
+				{device_id},
+				{$set: newSet, $push: {schedule: {$each: scheduleTime}}},
 				{new: true}
 			)
 			.lean()

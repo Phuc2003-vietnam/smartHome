@@ -1,3 +1,2 @@
-console.log(Date(Date.now()))
-let a = {name: 'phuc'}
-console.log([a])
+let a = 3
+console.log(a.toString())
