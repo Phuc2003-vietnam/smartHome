@@ -78,8 +78,8 @@ class MqttService {
                     MqttService.mqttClient.subscribe('fan', { qos: 0 });
                     MqttService.mqttClient.subscribe('door', { qos: 0 });
 
-                    MqttService.mqttClient.subscribe('light-living-room', { qos: 0 });
-                    MqttService.mqttClient.subscribe('light-kitchen', { qos: 0 });
+                    MqttService.mqttClient.subscribe('living-room-light', { qos: 0 });
+                    MqttService.mqttClient.subscribe('kitchen-light', { qos: 0 });
 
                     MqttService.mqttClient.subscribe('temperature', { qos: 0 });
                     MqttService.mqttClient.subscribe('humidity', { qos: 0 });

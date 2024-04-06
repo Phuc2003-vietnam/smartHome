@@ -33,6 +33,8 @@ async function changeDetail({
 			}
 			MqttService.mqttClient.publish(topic, level.toString(), {qos: 0})
 		} else if (topic != 'fan' && topic != -1) {
+			console.log("Im herre")
+			console.log(topic);
 			MqttService.mqttClient.publish(topic, state.toString(), {qos: 0})
 		}
 	}
