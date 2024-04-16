@@ -14,15 +14,6 @@ async function voiceAnalyze({command = ''}) {
     // Initial <level> for optional
     initSet.level = -1
 
-    // Find <state>
-    if (command.includes('on') || command.includes('open')) {
-        initSet.state = true
-    } else if (command.includes('off') || command.includes('close')) {
-        initSet.state = false
-    } else {
-        return Promise.reject({status: 400, message: 'No state included'})
-    }
-
     // Find <topic> 
     if (command.includes('fan')) {
         initSet.topic = 'fan'
@@ -39,6 +30,13 @@ async function voiceAnalyze({command = ''}) {
     } else {
         return Promise.reject({status: 400, message: 'Device not found'})
     }
+
+    // Find <state>
+    if (command.includes('on') || command.includes('open')) {
+        initSet.state = true
+    } else {
+        initSet.state = false
+    }
     
     // Find <device_id>
     let query = {}
@@ -50,10 +48,33 @@ async function voiceAnalyze({command = ''}) {
     catch (err) {
         return Promise.reject({status: 400, message: 'Device not found'})
     }
+
+    // Find <level> in case of device is 'fan'
+    if (deviceFound[0].type === 'fan') {
+        let fanLv = findLevel(command)
+        if (fanLv != -1) {
+            initSet.state = true
+            if (command.includes('increase') || command.includes('higher')) {
+                initSet.level = Math.min(deviceFound[0].level + fanLv, 3)
+            } else if (command.includes('decrease') || command.includes('lower')) {
+                initSet.level = Math.max(deviceFound[0].level - fanLv, 1)
+            } else if (command.includes('level')) {
+                initSet.level = fanLv
+            }
+        }
+    }
+
     
     // Call changeDetail to update state & level of device
 	var data = await new Device().changeDetail(initSet)
     return data
+}
+
+function findLevel(command = '') {
+    if (command.includes('one') || command.includes(' 1 ')) return 1
+    if (command.includes('two') || command.includes(' 2 ')) return 2
+    if (command.includes('three') || command.includes(' 3 ')) return 3
+    return -1
 }
 
 export default voiceAnalyze
