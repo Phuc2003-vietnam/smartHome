@@ -12,6 +12,7 @@
 	const configExpressApp = async (app) => {
 		const httpServer = createServer(app)
 		db.connect()
+		db.reInitSchedule()
 		MqttService.connect()
 		app.set('port', port)
 		app.use(cors())

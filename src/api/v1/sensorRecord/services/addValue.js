@@ -2,6 +2,8 @@ import sensorRecord from '#~/model/sensorRecord.js'
 import DeviceService from '#~/api/v1/device/services/index.js'
 import NotificationService from '#~/api/v1/notification/services/index.js'
 
+//Note: KHi mà data gửi về cứ value>limit thì notification khá nhiều
+// thì nên xử lí như thế nào
 // Add value to sensor record(also check auto mode ) and handle if value>limit
 async function addValue({value, limit, type}) {
 	// console.log('value: ', value, 'limit: ', limit, 'type: ', type)

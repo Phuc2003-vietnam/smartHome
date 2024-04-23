@@ -3,9 +3,9 @@ import getDevices from './getDevices.js'
 import scheduleJob from './scheduleJob.js'
 
 
-class Device {
+class DeviceService {
     changeDetail=changeDetail
     getDevices=getDevices
     scheduleJob=scheduleJob
 }
-export default Device
+export default DeviceService
