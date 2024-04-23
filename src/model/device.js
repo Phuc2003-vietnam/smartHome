@@ -10,14 +10,14 @@ const deviceSchema = new Schema(
 		level: {type: Number, default: true},
 		close_time:{type:Number,default:20},
 		type: {type: String, enum: ['fan', 'door', 'light'], default: 'auto'},
-		topic: {type: String, enum: ['fan', 'door', 'kitchen-light','living-room-light'], default: 'auto'},
+		topic: {type: String, enum: ['fan', 'door', 'kitchen-light', 'living-room-light'], default: 'auto'},
 		schedule: [
 			{
 				start_schedule_id: {type: String, default: 'default'},
 				end_schedule_id: {type: String, default: 'default'},
 				start: {type: Date, default: Date.now},
 				end: {type: Date, default: Date.now},
-				level: {type: Number, default: 1},
+				level: {type: Number, default: 1},	
 			},
 		],
 	},

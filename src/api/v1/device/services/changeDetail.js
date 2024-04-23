@@ -31,7 +31,6 @@ async function changeDetail({
 	}
 	if (state != -1) {
 		newSet.state = state
-		//Update the state of hardware
 		if (topic == 'fan') {
 			let level = 0
 			if (state == 1) {
