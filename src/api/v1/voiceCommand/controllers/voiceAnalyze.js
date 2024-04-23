@@ -1,7 +1,8 @@
-// Command structure:
-//  - "Turn on"/"Turn off" + <name of device> + <level (optional)> 
-// or "Open"/"Close" + "door"
-// Command can be in any order
+// Valid command structure:
+// - Include 1 on 3 device type ('fan', 'door', 'light")
+// - 'on'/'off' or 'open'/'close' to set state
+// - ['increase', 'up', 'higher']/['decrease', 'down', 'lower'] to change fan level up/down
+// - Can change state of multiple devices using 'all' keyword of include device name in command
 // FE use voice recognizer to parse voice command as a string in req.body, then analyze it in BE
 // Hint for FE: use Expo Dev Client and EAS CLI to install @react-native-voice lib for speech-to-text
 
@@ -17,7 +18,6 @@ const voiceAnalyze = async (req, res, next) => {
 	try {
 		const data = await new VoiceControl().voiceAnalyze(req.body)
         res.status(200).json({data})
-		console.log("Voice command successful")
 	} catch (err) {
 		next(err)
 	}
