@@ -26,13 +26,12 @@ async function addValue({value, limit, type}) {
 			}
 		}
 		await new NotificationService().addNotification({description})
-	} else {
-		await sensorRecord.create({
-			type,
-			value,
-			limit,
-		})
 	}
+	sensorRecord.create({
+		type,
+		value,
+		limit,
+	})
 }
 
 export default addValue

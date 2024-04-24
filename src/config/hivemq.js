@@ -42,11 +42,12 @@ class MqttService {
 				MqttService.mqttClient.on('message', async function (topic, message) {
 					try {
 						let str = message.toString()
-						let parts = str.split(':')
+						// let parts = str.split(':')	// remember to undo 
 						if (topic == 'led-bed-room') {
 							// Handle led-bed-room topic
 						} else if (topic === 'temperature') {
-							let temperature = parts[1].trim().split('°')[0]
+							// let temperature = parts[1].trim().split('°')[0] // remember to undo 
+							let temperature=str // remember to undo 
 							await new SensorService().addValue({
 								value: temperature,
 								limit: LIMIT_TEMP,
