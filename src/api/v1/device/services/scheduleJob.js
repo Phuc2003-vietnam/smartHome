@@ -21,12 +21,17 @@ function isIntersect(arr, n) {
 function isDateValid(start, end) {
 	let startDate = new Date(start)
 	let endDate = new Date(end)
+	let currentDate = new Date()
+	currentDate.setHours(0, 0, 0, 0)
+	let tomorrowDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000)
 	if (isNaN(startDate) || isNaN(endDate)) {
 		return 0
 	}
 	if (startDate > endDate) {
 		return 0
 	}
+	if (startDate < currentDate || endDate > tomorrowDate)
+		return 0
 	return 1
 }
 //isReset==true means we restart server so we have to schedule everything again
