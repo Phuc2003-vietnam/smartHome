@@ -12,11 +12,13 @@
 // 		"command": <a string converted into lowercase>
 // 	}
 
-import VoiceControl from "../service/index.js"
+// return data: data of all modified devices as a <Device> entity
+
+import VoiceControlService from "../service/index.js"
 
 const voiceAnalyze = async (req, res, next) => {
 	try {
-		const data = await new VoiceControl().voiceAnalyze(req.body)
+		const data = await new VoiceControlService().voiceAnalyze(req.body)
         res.status(200).json({data})
 	} catch (err) {
 		next(err)

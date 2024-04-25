@@ -18,7 +18,8 @@ async function voiceAnalyze({command = ''}) {
     
     // Return data of all updated devices
     var returnData = []
-    
+    var checkUpdate = false
+
     try {
         // Check for deviceType = light
         if (command.includes('light') || command.includes('lights')) {
@@ -36,6 +37,7 @@ async function voiceAnalyze({command = ''}) {
             else {
                 for (let i = 0; i < deviceFound.length; i++) {
                     if (isAll || command.includes(deviceFound[i].name.toLowerCase())) {
+                        checkUpdate = true
                         initSet.device_id = deviceFound[i].device_id
                         initSet.topic = deviceFound[i].topic
                         // Update state of device and include device data into result
@@ -60,6 +62,7 @@ async function voiceAnalyze({command = ''}) {
             else {
                 for (let i = 0; i < deviceFound.length; i++) {
                     if (isAll || command.includes(deviceFound[i].name.toLowerCase())) {
+                        checkUpdate = true
                         initSet.device_id = deviceFound[i].device_id
                         initSet.topic = deviceFound[i].topic
                         // Update state of device and include device data into result
@@ -94,6 +97,7 @@ async function voiceAnalyze({command = ''}) {
             else {
                 for (let i = 0; i < deviceFound.length; i++) {
                     if (isAll || command.includes(deviceFound[i].name.toLowerCase())) {
+                        checkUpdate = true
                         initSet.device_id = deviceFound[i].device_id
                         initSet.topic = deviceFound[i].topic
                         if (updateLevel != 'none') {
@@ -109,9 +113,10 @@ async function voiceAnalyze({command = ''}) {
             }
         }
         else return Promise.reject({status: 400, message: 'Command Unrecognizable'})
+        if (!checkUpdate) return Promise.reject({status: 400, message: 'No Device Found'})
     }
     catch (err) {
-        return Promise.reject({status: 400, message: 'Bad Request'})
+        return Promise.reject({status: 401, message: err})
     }
     
     return returnData

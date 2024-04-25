@@ -1,7 +1,7 @@
 import voiceAnalyze from "./voiceAnalyze.js"
 
-class VoiceControl {
+class VoiceControlService {
     voiceAnalyze = voiceAnalyze 
 }
 
-export default VoiceControl
+export default VoiceControlService
