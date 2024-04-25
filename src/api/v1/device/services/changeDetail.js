@@ -1,5 +1,6 @@
 import device from '#~/model/device.js'
 import MqttService from '#~/config/hivemq.js'
+import DeviceLogService from '../../deviceLog/service/index.js'
 
 //isScheduleDeleted to check if user want to delete the schedule or
 //add a new schedule to existing schedules, if isScheduleDeleted true => FE only needs
@@ -108,7 +109,8 @@ async function changeDetail({
 			)
 			.lean()
 	}
-
+	// Add logs for every change
+	new DeviceLogService().addNewLog({device_id, state, level})
 	return updatedDevice
 }
 
