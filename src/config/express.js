@@ -6,12 +6,14 @@
 	import db from "./mongoDB.js";
 	import MqttService from "./hivemq.js";
 	import {createServer} from 'http'
-
+	import DashboardService from '#~/api/v1/dashboard/services/index.js';
 	const port =  8000
 
 	const configExpressApp = async (app) => {
 		const httpServer = createServer(app)
 		db.connect()
+		db.reInitSchedule()
+		// new DashboardService().computeAverageHourly()
 		MqttService.connect()
 		app.set('port', port)
 		app.use(cors())
