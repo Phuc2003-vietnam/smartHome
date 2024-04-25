@@ -1,12 +1,12 @@
 import DeviceLogs from "#~/model/log.js";
 
-async function getLogs({
+async function getLogs(
     limit = 20,
     offset = 0
-}) {
+) {
     try {
         // await DeviceLogs.deleteMany({})
-        const logs = await DeviceLogs.find({}).skip(offset).sort({createdAt: -1}).limit(limit).lean()
+        const logs = await DeviceLogs.find({}).skip(offset).limit(limit).sort({createdAt: -1}).lean()
         return logs
     }
     catch (err)
