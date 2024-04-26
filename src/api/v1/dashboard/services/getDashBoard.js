@@ -94,7 +94,9 @@ async function getDashBoard({date, type='temperature'}) {
 		let todayEnd = moment(date).endOf('day').toDate()
 		var dashboardRecord = await DashBoard.findOne({
 			createdAt: {$gte: todayStart, $lt: todayEnd},
+			type
 		}).lean()
+		// console.log(dashboardRecord);
 		data.realData = []
 		if (dashboardRecord) {
 			data.realData = dashboardRecord.hourlyValue

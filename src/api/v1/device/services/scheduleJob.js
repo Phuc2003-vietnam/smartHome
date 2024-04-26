@@ -30,8 +30,7 @@ function isDateValid(start, end) {
 	if (startDate > endDate) {
 		return 0
 	}
-	if (startDate < currentDate || endDate > tomorrowDate)
-		return 0
+	if (startDate < currentDate || endDate > tomorrowDate) return 0
 	return 1
 }
 //isReset==true means we restart server so we have to schedule everything again
@@ -159,7 +158,7 @@ async function scheduleDoor({obj, topic}) {
 		var currentDate = new Date(Date.now())
 		console.log('Door close time: ', door.close_time)
 		console.log('Current time: ', currentDate)
-		// currentDate.setMinutes(currentDate.getMinutes() + door.close_time)
+		// currentDate.setMinutes(currentDate.getMinutes() + door.close_time)			//NOTE :need to use this
 		currentDate.setSeconds(currentDate.getSeconds() + door.close_time)
 		console.log('Time after add close_time: ', currentDate)
 
@@ -176,7 +175,11 @@ async function scheduleDoor({obj, topic}) {
 				//Close the door using hiveMQ
 				console.log('fuck you')
 				let state = 0
-				MqttService.mqttClient.publish(topic, state.toString(), {qos: 0})
+				obj.changeDetail({
+					device_id: door.device_id,
+					state,
+					topic: 'door',
+				})
 			}
 		)
 		obj.changeDetail({
