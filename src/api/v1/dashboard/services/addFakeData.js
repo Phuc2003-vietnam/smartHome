@@ -1,6 +1,7 @@
 import moment from 'moment'
 import DashBoard from '#~/model/dashboard.js'
-async function addFakeData({fakeData, date}) {
+//add fake data first then get dashboard
+async function addFakeData({fakeData, date,type="temperature"}) {
 	try {
 		let todayStart = moment(date).startOf('day').toDate()
 		let todayEnd = moment(date).endOf('day').toDate()
@@ -9,11 +10,12 @@ async function addFakeData({fakeData, date}) {
 		let dashboardRecord = await DashBoard.findOneAndUpdate(
 			{
 				createdAt: {$gte: todayStart, $lt: todayEnd},
+				type
 			},
 			{
 				$setOnInsert: {
 					createdAt: todayStart,
-					type: 'temperature',
+					type,
 					hourlyValue: fakeData,
 				},
 			},

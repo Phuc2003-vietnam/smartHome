@@ -2,9 +2,9 @@ import DashboardService from '../services/index.js'
 
 const getDashBoard = async (req, res, next) => {
 	try {
-		var {date}=req.query
+		var {date,type}=req.query
 		const data = await new DashboardService().getDashBoard({
-			date
+			date,type
 		})
 		res.status(200).json({data})
 	} catch (err) {
