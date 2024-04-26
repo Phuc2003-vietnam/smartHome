@@ -86,7 +86,7 @@ class MqttService {
 
 					MqttService.mqttClient.subscribe('temperature', {qos: 0})
 					MqttService.mqttClient.subscribe('humidity', {qos: 0})
-					// MqttService.mqttClient.subscribe('brightness', {qos: 0})
+					MqttService.mqttClient.subscribe('brightness', {qos: 0})
 
 				})
 			} catch (err) {
