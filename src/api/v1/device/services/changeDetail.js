@@ -44,6 +44,10 @@ async function changeDetail({
 			MqttService.mqttClient.publish(topic, state.toString(), {qos: 0})
 		}
 	}
+
+	// Add logs for every change
+	new DeviceLogService().addNewLog({device_id, state, level})
+
 	if (isAuto != -1) {
 		newSet.isAuto = isAuto
 	}
@@ -109,8 +113,6 @@ async function changeDetail({
 			)
 			.lean()
 	}
-	// Add logs for every change
-	new DeviceLogService().addNewLog({device_id, state, level})
 	return updatedDevice
 }
 
