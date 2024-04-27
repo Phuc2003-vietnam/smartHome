@@ -25,7 +25,10 @@ async function addValue({value, limit, type}) {
 				deviceObj.changeDetail({device_id: fan.device_id, level})
 			}
 		}
-		await new NotificationService().addNotification({description})
+		let notiService=new NotificationService()
+		await notiService.addNotification({description})
+		await notiService.sendNotiFirebase({msg:description})
+
 	}
 	sensorRecord.create({
 		type,
