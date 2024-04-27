@@ -20,6 +20,7 @@ async function addNewLog({
                 }
                 else deviceLogInfo += (deviceFound[0].type == 'door'? 'closed' : 'turned off')
                 DeviceLogs.create({deviceLogInfo})
+                console.log(deviceLogInfo)
             }
         }
         return
