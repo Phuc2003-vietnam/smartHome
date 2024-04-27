@@ -66,7 +66,7 @@ class MqttService {
 							var door = (
 								await deviceObj.getDevices({type: "door"})
 							)[0]
-							if (door.isAuto) {
+							if (door.isAuto && door.state) {
 								deviceObj.scheduleJob({topic: 'door'})
 							}
 						}
