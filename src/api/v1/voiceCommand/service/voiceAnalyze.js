@@ -24,8 +24,8 @@ async function voiceAnalyze({command = ''}) {
         // Check for deviceType = light
         if (command.includes('light') || command.includes('lights')) {
             // Check state
-            if (command.includes('on')) initSet.state = true
-            else if (command.includes('off')) initSet.state = false
+            if (command.includes('on')) initSet.state = 1
+            else if (command.includes('off')) initSet.state = 0
             else return Promise.reject({status: 400, message: 'Invalid Action'})
             // Find any device included in command
             var isAll = false
@@ -49,8 +49,8 @@ async function voiceAnalyze({command = ''}) {
         // Check for deviceType = door
         else if (command.includes('door') || command.includes('doors')) {
             // Check state
-            if (command.includes('open')) initSet.state = true
-            else if (command.includes('close')) initSet.state = false
+            if (command.includes('open')) initSet.state = 1
+            else if (command.includes('close')) initSet.state = 0
             else return Promise.reject({status: 400, message: 'Invalid Action'})
             // Find any device included in command
             var isAll = false
@@ -75,14 +75,14 @@ async function voiceAnalyze({command = ''}) {
         else if (command.includes('fan') || command.includes('fans')) {
             // Check state
             var updateLevel = 'none'
-            if (command.includes('on')) initSet.state = true
-            else if (command.includes('off')) initSet.state = false
+            if (command.includes('on')) initSet.state = 1
+            else if (command.includes('off')) initSet.state = 0
             else if (command.includes('increase') || command.includes('up') || command.includes('higher')) {
-                initSet.state = true
+                initSet.state = 1
                 updateLevel = 'up'
             }
             else if (command.includes('decrease') || command.includes('down') || command.includes('lower')) {
-                initSet.state = true
+                initSet.state = 1
                 updateLevel = 'down'
             }
             else return Promise.reject({status: 400, message: 'Invalid Action'})
